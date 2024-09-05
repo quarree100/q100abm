@@ -4,6 +4,7 @@
 
 ./**/.cache
 ./**/.metadata
+./.metadata
 ./**/includes
 **/includes
 
