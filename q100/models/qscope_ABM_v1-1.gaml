@@ -135,7 +135,7 @@ global {
 	float energy_saving_rate <- get_initial_value_float("energy_saving_rate"); // generaliuzed energy-saving of modernized buildings in percent
   	float change_factor <- get_initial_value_float("change_factor"); // Energy-Saving of households with change = true
   	float change_threshold <- get_initial_value_float("change_threshold"); // minimum value for EEH to decide for decision "change" -> based on above average values of agent's EEH variable
-  	float landlord_prop <- get_initial_value_float("landlord_prop"); // chance to convince landlord of building to connect to q100_heat_network after invest_decision was made - strong need of validation due to lack of data / literature
+  	float landlord_prop <- get_initial_value_float("landlord_prop"); // chance to convince landlord of building to connect to q100_heat_network after invest_decision was made
   	float MFH_connection_threshold <- get_initial_value_float("MFH_connection_threshold"); // share of MFH households with decision invest=true that is needed to connect building to heat_network
   	float feedback_factor <- get_initial_value_float("feedback_factor"); // influence factor of feedback after a decision is made or household moved into a building with q100-connection
   	bool B_feedback <- get_initial_value_bool("B_feedback"); // Feedback of a decision on other perceived behavioral control values on-off
@@ -180,11 +180,11 @@ global {
 // init-section
 	init {
 	global_neighboring_distance <- get_initial_value_int("global_neighboring_distance");
-	new_buildings_order_random <- get_initial_value_bool("new_buildings_order_random"); // TODO future work will determine a specific order of construction of new_buildings
-	energy_saving_rate <- get_initial_value_float("energy_saving_rate"); // generaliuzed energy-saving of modernized buildings in percent
+	new_buildings_order_random <- get_initial_value_bool("new_buildings_order_random"); // future work should determine a specific order of construction of new_buildings based on the municipality's planning
+	energy_saving_rate <- get_initial_value_float("energy_saving_rate"); // generalized energy-saving of modernized buildings in percent
   	change_factor <- get_initial_value_float("change_factor"); // Energy-Saving of households with change = true
   	change_threshold <- get_initial_value_float("change_threshold"); // minimum value for EEH to decide for decision "change" -> based on above average values of agent's EEH variable
-  	landlord_prop <- get_initial_value_float("landlord_prop"); // chance to convince landlord of building to connect to q100_heat_network after invest_decision was made - strong need of validation due to lack of data / literature
+  	landlord_prop <- get_initial_value_float("landlord_prop"); // chance to convince landlord of building to connect to q100_heat_network after invest_decision was made
   	MFH_connection_threshold <- get_initial_value_float("MFH_connection_threshold"); // share of MFH households with decision invest=true that is needed to connect building to heat_network
   	feedback_factor <- get_initial_value_float("feedback_factor"); // influence factor of feedback after a decision is made or household moved into a building with q100-connection
   	B_feedback <- get_initial_value_bool("B_feedback"); // Feedback of a decision on other perceived behavioral control values on-off
@@ -193,11 +193,10 @@ global {
 	share_families <- get_initial_value_float("share_families"); // share of families in whole neighborhood
 	share_socialgroup_families <- get_initial_value_float("share_socialgroup_families"); // share of families that are part of a social group
 	share_socialgroup_nonfamilies <- get_initial_value_float("share_socialgroup_nonfamilies"); // share of households that are not families but part of a social group
-	private_communication <- get_initial_value_float("private_communication"); // influence on psychological data while private communication; value used in communication action, accessable in monitor; must be experimented, since high influence
+	private_communication <- get_initial_value_float("private_communication"); // influence on psychological data while private communication; value used in communication action, accessable in monitor
 	influence_type <- get_initial_value_string("influence_type");
 	communication_memory <- get_initial_value_bool("communication_memory");
 	model_runtime_int <- get_initial_value_int("model_runtime_int");
-
 
 
 	if (timestamp = "") // only delete files in general output folder if using GUI
@@ -241,9 +240,6 @@ global {
 		}
 		nb_units <- get_nb_units();
 
-
-
-
 		int row_interchange <- 0;
 		loop qscope_interchange over: qscope_interchange_matrix column_at 0 { // integrates individually made changes on qscope by users for buildings of the GAMA model
 			ask (building where (each.id = qscope_interchange)) {
@@ -256,27 +252,13 @@ global {
 					if (int(qscope_interchange_matrix[5,row_interchange]) > 0) {
 						refurb_year <- int(qscope_interchange_matrix[5,row_interchange]);
 					}
-	
-	
 					if (qscope_interchange_matrix[6,row_interchange] = "True") {
 						self.change_tenants <- true;
-	
-	
-	//					ask self.get_tenants() {
-	//						write self.name + "I change";
-	//						change <- true;
-	//						// do decision_feedback_attitude;
-	//						// do decision_feedback_B ---> validation ---> should be implemented?
-	//					}
-	
-					}
-				
+					}	
 				}
 			}
 			row_interchange <- row_interchange + 1;
 		}
-
-
 
 
 		create nahwaermenetz from: nahwaerme;
@@ -469,7 +451,8 @@ global {
 // end of init-section
 
 // utility-functions
-	// The yearly development of alpha is stored in a matrix. Thsi function returns the column-number for each scenario.
+	// The yearly development of alpha is stored in a matrix. This function returns the column-number for each scenario.
+	
 	int alpha_column { 
 		if alpha_scenario = "Static_mean" {
 			return 1;
@@ -487,7 +470,7 @@ global {
 			error "No valid alpha-scenario";
 		}
 	}
-	// The yearly development of the carbon-price is stored in a matrix. Thsi function returns the column-number for each scenario.
+	// The yearly development of the carbon-price is stored in a matrix. This function returns the column-number for each scenario.
 	int carbon_price_column { 
 		if  carbon_price_scenario = "A - Conservative" {
 			return 1;
@@ -506,7 +489,7 @@ global {
 		}
 
 	}
-	// The yearly development of the gas price is stored in a matrix. Thsi function returns the column-number for each scenario.
+	// The yearly development of the gas price is stored in a matrix. This function returns the column-number for each scenario.
 	int gas_price_column { 
 		if  energy_price_scenario = "Prices_Project start" {
 			return 1;
@@ -518,7 +501,7 @@ global {
 			return 3;
 		}
 	}
-	// The yearly development of the oil price is stored in a matrix. Thsi function returns the column-number for each scenario.
+	// The yearly development of the oil price is stored in a matrix. This function returns the column-number for each scenario.
 	int oil_price_column { 
 		if  energy_price_scenario = "Prices_Project start" {
 			return 5;
@@ -530,7 +513,7 @@ global {
 			return 7;
 		}
 	}
-	// The yearly development of power price is stored in a matrix. Thsi function returns the column-number for each scenario.
+	// The yearly development of power price is stored in a matrix. This function returns the column-number for each scenario.
 	int power_price_column { 
 		if  energy_price_scenario = "Prices_Project start" {
 			return 9;
@@ -542,7 +525,7 @@ global {
 			return 11;
 		}
 	}
-	// The yearly development of the opex-price for the q100 heat-grid is stored in a matrix. Thsi function returns the column-number for each scenario.
+	// The yearly development of the opex-price for the q100 heat-grid is stored in a matrix. This function returns the column-number for each scenario.
 	int q100_price_opex_column { 
 		if  q100_price_opex_scenario = "12 ct / kWh (static)" {
 			return 1;
@@ -551,7 +534,7 @@ global {
 			return 2;
 		}
 	}
-	// The yearly development of the emissions of the q100 heat-grid is stored in a matrix. Thsi function returns the column-number for each scenario.
+	// The yearly development of the emissions of the q100 heat-grid is stored in a matrix. This function returns the column-number for each scenario.
 	int q100_emissions_column { 
 		if  q100_emissions_scenario = "Constant_50g_/_kWh" {
 			return 6;
@@ -566,7 +549,7 @@ global {
 			return 9;
 		}
 	}
-	// The yearly development of capex-price for the q100 heat-grid is stored in a matrix. Thsi function returns the column-number for each scenario.
+	// The yearly development of capex-price for the q100 heat-grid is stored in a matrix. This function returns the column-number for each scenario.
 	int q100_price_capex_column { 
 		if  q100_price_capex_scenario = "1 payment" {
 			return 3;
@@ -708,7 +691,7 @@ global {
 	}
 	
 // reflexes
-	// Pauses the simulation when the year 'model_runtime_int', specified as a parameter,  is reached. 
+	// Pauses the simulation when the year 'model_runtime_int', specified as a parameter, is reached. 
 	reflex end_simulation when: (current_date.year = model_runtime_int) and (current_date.month = 1) and (current_date.day = 1){
     	do pause;
     }
@@ -1128,6 +1111,7 @@ species building {
 		}
 	}
 	
+	
 	// aspects
 	aspect base {
 		if built {
@@ -1478,7 +1462,7 @@ species households {
 		        		if (self.A_e < mean([myself.A_e, self.A_e])) and self.A_e < 7 {
 		        			self.A_e <- self.A_e + private_communication;
 		        			if influence_type = "both_sides"{
-		        				myself.A_e <- myself.A_e - private_communication;// validierung - wie kann hier ein nachvollziehbarer wert gewaehlt werden? Oder muss dies Teil der Untersuchtung sein? & wieso - unendlich?
+		        				myself.A_e <- myself.A_e - private_communication;
 		        			}
 		        		}
 		        		else if A_e > 0 {
@@ -1529,7 +1513,7 @@ species households {
 		do calculate_hypo_e;
 
 		c_current <- income - (e_current);
-		c_invest <- income - (e_invest + q100_price_capex); // langfristige Vorteile des Investments müssen evtl noch bedacht werden??
+		c_invest <- income - (e_invest + q100_price_capex);
 		c_change <- income - (e_change);
 		c_switch <- income - (e_switch);
 	}
@@ -1655,7 +1639,6 @@ species households {
 	}
 	
 	// calculation of energy consumption of a household // has to be calculated after c, to represent t-1 
-	 //TODO  grafische Darstellung des Endenergieverbrauchs von Haushalten im Vergleich mit Agora-Wert?
 	action consume_energy { 
 
 		do calculate_consumption;
@@ -1814,7 +1797,7 @@ species households {
 
 		if (power_supplier = "green") {
 
-			my_power_emissions <- 0.0; // Emissionen tatsaechlich als 0 annehmen?
+			my_power_emissions <- 0.0; 
 
 		}
 		else if (power_supplier = "mixed") {
@@ -2093,7 +2076,7 @@ experiment agent_decision_making type: gui{
 
 				save [cycle, current_date, emissions_neighborhood_total, emissions_household_average, emissions_neighborhood_accu, emissions_household_average_accu, modernization_rate]
 
-				to: export_file format: csv rewrite: false header: true; // löschung der datei implementieren
+				to: export_file format: csv rewrite: false header: true; 
 			}
 		}
 	}
